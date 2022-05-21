@@ -30,7 +30,8 @@ public class Principal extends JFrame {
             @Override
             public void run() {                
                 JFrame ex = new Principal();
-                ex.setVisible(true);                
+                ex.setVisible(true);  
+                
             }
         });
     }

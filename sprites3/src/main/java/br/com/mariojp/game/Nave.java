@@ -7,6 +7,8 @@ import java.util.ArrayList;
 public class Nave extends Sprite {
 	private int dx;
 	private int dy;
+	
+	public static int life = 3;
 
 	private int alcance;
 	
@@ -38,6 +40,7 @@ public class Nave extends Sprite {
 		int key = e.getKeyCode();
 		if (key == KeyEvent.VK_SPACE) {
 			atira(); 
+			Som.audio.play(); //Instancia da classe som (Se a nave atirar sairá o som de tiro)
 		}
 		if (key == KeyEvent.VK_LEFT){ 
 			dx= -1;

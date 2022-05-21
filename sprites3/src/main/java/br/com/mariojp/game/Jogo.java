@@ -11,9 +11,12 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
+import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 import javax.swing.Timer;
 
@@ -23,6 +26,9 @@ public class Jogo extends JPanel implements ActionListener {
 
 	private Timer timer;
 	private Nave nave;
+	private BufferedImage Game_Background;// imagem de fundo
+	private BufferedImage Game_life;// imagem de fundo
+
 
 	private int score = 0;
 
@@ -31,12 +37,12 @@ public class Jogo extends JPanel implements ActionListener {
 	private Random random = new Random();
 
 	private boolean endgame = false;
-
-	private final int DELAY = 10;
+	
+	private final int DELAY = 0;
 
 	private final int B_WIDTH = 800;
 	private final int B_HEIGHT = 600;
-
+		
 	public Jogo() {
 		initJogo();
 	}
@@ -48,18 +54,29 @@ public class Jogo extends JPanel implements ActionListener {
 		setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
 		setDoubleBuffered(true);
 		nave = new Nave(40, 60, B_WIDTH);
-
+		
 		timer = new Timer(DELAY, this);
 		timer.start();
+
+		try {
+			Game_Background = ImageIO.read(getClass().getResource("/imagens/background.png"));// buscando a imagem
+			Game_life = ImageIO.read(getClass().getResource("/imagens/life.png"));// buscando a imagem
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+
+
 	}
 
 	private void drawGameOver(Graphics g) {
-		String msg = "Game Over";
-		Font small = new Font("Helvetica", Font.BOLD, 14);
+		String msg = "GAME OVER";
+		Font small = new Font("Arial", Font.BOLD, 25);
 		FontMetrics fm = getFontMetrics(small);
 		g.setColor(Color.white);
 		g.setFont(small);
 		g.drawString(msg, (B_WIDTH - fm.stringWidth(msg)) / 2, B_HEIGHT / 2);
+			
 	}
 
 	@Override
@@ -68,12 +85,15 @@ public class Jogo extends JPanel implements ActionListener {
 		if (!endgame) {
 			desenhar(g);
 		} else {
+			
 			drawGameOver(g);
+			
 		}
 		Toolkit.getDefaultToolkit().sync();
 	}
 
 	private void desenhar(Graphics g) {
+		g.drawImage(Game_Background, 0, 0, null);// inserindo a imagem de fundo
 		g.drawImage(nave.getImage(), nave.getX(), nave.getY(), this);
 
 		for (Missil m : nave.getMissiles()) {
@@ -88,6 +108,11 @@ public class Jogo extends JPanel implements ActionListener {
 		}
 		g.setColor(Color.WHITE);
 		g.drawString("PONTOS : " + score, 5, 15);
+
+		for (int j = 0; j < (int) Nave.life; j++) {
+			g.drawImage(Game_life, 720 + (j * 16), 5, 30, 30, null);// definir Largura, altura, distancia, posição e
+																	// tamanho da imagem life
+		}
 
 	}
 
@@ -120,9 +145,14 @@ public class Jogo extends JPanel implements ActionListener {
 			if (r3.intersects(r2)) {
 				nave.setVisible(false);
 				alien.setVisible(false);
+				Nave.life --; // A cada colisão retirar uma vida.
+
+			} else if (Nave.life < 0) {// Se a quantidade de vida chegar a 0 é informado Game Over
 				endgame = true;
+
 			}
 		}
+
 		ArrayList<Missil> ms = nave.getMissiles();
 		for (Missil m : ms) {
 			Rectangle r1 = m.getBounds();
@@ -131,12 +161,16 @@ public class Jogo extends JPanel implements ActionListener {
 				if (r1.intersects(r2)) {
 					m.setVisible(false);
 					alien.setVisible(false);
-					score++;
-					if(score > 10) {
-						endgame = true;
+
+					// Se a nave tiver entre 3 e 1 vida ganhara 50 pontos.,
+					if (Nave.life >= 2 || Nave.life <= 3) {//
+						score += 50;
+
 					}
+
 				}
 			}
+
 		}
 	}
 
