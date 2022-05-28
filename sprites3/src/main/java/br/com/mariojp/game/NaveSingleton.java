@@ -4,7 +4,7 @@ import java.awt.Image;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 
-public class Nave extends Sprite {
+public class NaveSingleton extends Sprite {
 	private int dx;
 	private int dy;
 	
@@ -13,13 +13,22 @@ public class Nave extends Sprite {
 	private int alcance;
 	
     private ArrayList<Missil> missiles;
+    
+	private Resolucao resolucao = new Resolucao();
 
-	public Nave(int x, int y, int alcance) {
+    private static NaveSingleton InstanciaUnica = new NaveSingleton(40, 60, Resolucao.getB_WIDTH());
+
+    
+	public NaveSingleton(int x, int y, int alcance) {
 		super(x, y);
 		this.alcance = alcance;
 		initNave();
 	}
 
+	public static NaveSingleton getInstanciaUnica() {
+		return InstanciaUnica;
+	}
+	
 	private void initNave() {
 		missiles = new ArrayList<Missil>(); 
 		carregarImagem("/imagens/nave.png"); 

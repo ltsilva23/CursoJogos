@@ -24,8 +24,8 @@ public class Jogo extends JPanel implements ActionListener {
 
 	private static final long serialVersionUID = 1L;
 
-	private Timer timer;
-	private Nave nave;
+	private TimerCommand timer_command;
+	private NaveSingleton nave;
 	private BufferedImage Game_Background;// imagem de fundo
 	private BufferedImage Game_life;// imagem de fundo
 
@@ -35,13 +35,13 @@ public class Jogo extends JPanel implements ActionListener {
 	private ArrayList<Inimigo> inimigos = new ArrayList<Inimigo>();
 
 	private Random random = new Random();
-
+		
 	private boolean endgame = false;
 	
 	private final int DELAY = 0;
 
-	private final int B_WIDTH = 800;
-	private final int B_HEIGHT = 600;
+	private final int B_WIDTH = Resolucao.getB_WIDTH();
+	private final int B_HEIGHT = Resolucao.getB_HEIGHT();
 		
 	public Jogo() {
 		initJogo();
@@ -53,10 +53,11 @@ public class Jogo extends JPanel implements ActionListener {
 		setBackground(Color.BLACK);
 		setPreferredSize(new Dimension(B_WIDTH, B_HEIGHT));
 		setDoubleBuffered(true);
-		nave = new Nave(40, 60, B_WIDTH);
+		nave = NaveSingleton.getInstanciaUnica();
 		
-		timer = new Timer(DELAY, this);
-		timer.start();
+		timer_command = new TimerCommand(new Timer(DELAY, this));
+		timer_command.execute();
+
 
 		try {
 			Game_Background = ImageIO.read(getClass().getResource("/imagens/background.png"));// buscando a imagem
@@ -109,7 +110,7 @@ public class Jogo extends JPanel implements ActionListener {
 		g.setColor(Color.WHITE);
 		g.drawString("PONTOS : " + score, 5, 15);
 
-		for (int j = 0; j < (int) Nave.life; j++) {
+		for (int j = 0; j < (int) NaveSingleton.life; j++) {
 			g.drawImage(Game_life, 720 + (j * 16), 5, 30, 30, null);// definir Largura, altura, distancia, posição e
 																	// tamanho da imagem life
 		}
@@ -145,9 +146,9 @@ public class Jogo extends JPanel implements ActionListener {
 			if (r3.intersects(r2)) {
 				nave.setVisible(false);
 				alien.setVisible(false);
-				Nave.life --; // A cada colisão retirar uma vida.
+				NaveSingleton.life --; // A cada colisão retirar uma vida.
 
-			} else if (Nave.life < 0) {// Se a quantidade de vida chegar a 0 é informado Game Over
+			} else if (NaveSingleton.life < 0) {// Se a quantidade de vida chegar a 0 é informado Game Over
 				endgame = true;
 
 			}
@@ -163,7 +164,7 @@ public class Jogo extends JPanel implements ActionListener {
 					alien.setVisible(false);
 
 					// Se a nave tiver entre 3 e 1 vida ganhara 50 pontos.,
-					if (Nave.life >= 2 || Nave.life <= 3) {//
+					if (NaveSingleton.life >= 2 || NaveSingleton.life <= 3) {//
 						score += 50;
 
 					}
@@ -192,7 +193,7 @@ public class Jogo extends JPanel implements ActionListener {
 
 	private void stopGame() {
 		if (endgame) {
-			timer.stop();
+			timer_command.stop();
 		}
 	}
 
